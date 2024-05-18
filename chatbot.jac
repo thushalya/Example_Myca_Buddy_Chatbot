@@ -109,6 +109,7 @@ walker get_todays_all_tasks{
 
 
     can end with workette entry{
+        
         if len([-->])>0{
             self.bottom_workette_nodes =[-->];
             # print("bottom",self.bottom_workette_nodes);
@@ -121,6 +122,9 @@ walker get_todays_all_tasks{
                     # print(second_walker.group);
                     # subtask = "something";
                     # group ="group";
+                    if (node_item.context["status"]=="running"){
+                        node_item.context["status"] = "in progress";
+                    }
                     text = "the item is called {}, it is currently {}, it belongs to the group called {}".format(node_item.context["name"],node_item.context["status"],second_walker.group);
                     self.tasks.append(text);
                  }
@@ -277,7 +281,11 @@ get_walker_arguments(question: "Question": str) -> 'Walker and Arguments': tuple
 
 ## Call LLM second time to get the answer for that question
 can 'Get Conversational Answer and be more motivative'
-get_answer(question: 'Qiestion': str, tasks: "Tasks Relevant to the Question") -> 'Answer to the Question': str by llm();
+get_answer(
+    question: 'Question': str, 
+    tasks: "Tasks Relevant to the Question":list
+    ) -> 'Answer to the Question': str 
+    by llm();
 
 
 # ## call this function with the question of the user
@@ -305,8 +313,9 @@ with entry{
     # print(answer_question("do I have any tasks that are work related today?"));
     root spawn create_graph(json_file=json_file["report"][0]);
     all_tasks = root spawn get_todays_all_tasks();
-    print(all_tasks.tasks);
-    print(len(all_tasks.tasks));
+    print(get_answer("how many tasks do I have open today?",all_tasks.tasks));
+    # print(all_tasks.tasks);
+    # print(len(all_tasks.tasks));
 
   
     # root spawn create_graph(json_file=json_file["report"][0]);
